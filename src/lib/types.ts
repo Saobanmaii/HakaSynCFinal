@@ -9,6 +9,9 @@ export interface User {
   skills: string[];
   status: "Looking" | "Open" | "Busy";
   teamId?: string;
+  github?: string;
+  linkedin?: string;
+  projects?: PortfolioEntry[];
 }
 
 export interface Team {

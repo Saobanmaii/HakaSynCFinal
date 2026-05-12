@@ -175,45 +175,26 @@ function renderSlide(slide: SlideContent) {
   }
 }
 
-// ─── Countdown hook ───────────────────────────────────────────────────────────
-
-function useCountdown(date: string, time: string) {
-  const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const diff = new Date(`${date}T${time}:00`).getTime() - now.getTime();
-  if (diff <= 0) return { expired: true, days: 0, hours: 0, minutes: 0, seconds: 0 };
-  return {
-    expired: false,
-    days:    Math.floor(diff / 86_400_000),
-    hours:   Math.floor((diff % 86_400_000) / 3_600_000),
-    minutes: Math.floor((diff % 3_600_000) / 60_000),
-    seconds: Math.floor((diff % 60_000) / 1_000),
-  };
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function SlideMaker() {
-  const [triggerDate, setTriggerDate] = useState("2026-05-15");
-  const [triggerTime, setTriggerTime] = useState("13:00");
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [current, setCurrent] = useState(0);
-  const countdown = useCountdown(triggerDate, triggerTime);
 
   async function handleGenerate() {
+    if (!content.trim()) {
+      toast.error("Please paste your presentation content first.");
+      return;
+    }
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
     setGenerated(true);
     setCurrent(0);
     setLoading(false);
     toast.success("5 slides generated!", {
-      description: "AI read your completed tasks and built the deck.",
+      description: "AI read your content and built the deck.",
     });
   }
 
@@ -316,58 +297,17 @@ export default function SlideMaker() {
   return (
     <div className="max-w-2xl flex flex-col gap-6">
       <div className="bg-white rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-        <p className="font-semibold text-[#25262B] mb-4">Presentation trigger</p>
+        <p className="font-semibold text-[#25262B] mb-4">Presentation content</p>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex flex-col gap-1.5 flex-1">
-            <label className="text-xs font-medium text-[#8B8B8B]">Date</label>
-            <input
-              type="date"
-              value={triggerDate}
-              onChange={(e) => setTriggerDate(e.target.value)}
-              className="h-10 px-4 rounded-[12px] bg-[#F4F0EB] border border-[#E0D9D2] text-sm text-[#25262B] outline-none focus:ring-2 focus:ring-[#FFD034] transition"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5 flex-1">
-            <label className="text-xs font-medium text-[#8B8B8B]">Time</label>
-            <input
-              type="time"
-              value={triggerTime}
-              onChange={(e) => setTriggerTime(e.target.value)}
-              className="h-10 px-4 rounded-[12px] bg-[#F4F0EB] border border-[#E0D9D2] text-sm text-[#25262B] outline-none focus:ring-2 focus:ring-[#FFD034] transition"
-            />
-          </div>
-        </div>
-
-        {/* Countdown */}
-        <div className="bg-[#25262B] rounded-[20px] p-5">
-          {countdown.expired ? (
-            <div className="text-center">
-              <p className="text-[#FFD034] font-bold text-lg">Presentation time!</p>
-              <p className="text-white/50 text-sm mt-1">Generate your slides now</p>
-            </div>
-          ) : (
-            <>
-              <p className="text-white/40 text-[10px] uppercase tracking-widest text-center mb-3">
-                Slides auto-generate in
-              </p>
-              <div className="flex justify-center gap-5">
-                {[
-                  { value: countdown.days,    label: "Days" },
-                  { value: countdown.hours,   label: "Hours" },
-                  { value: countdown.minutes, label: "Min" },
-                  { value: countdown.seconds, label: "Sec" },
-                ].map(({ value, label }) => (
-                  <div key={label} className="flex flex-col items-center">
-                    <span className="text-white font-bold text-2xl w-10 text-center tabular-nums">
-                      {String(value).padStart(2, "0")}
-                    </span>
-                    <span className="text-white/40 text-[10px] uppercase tracking-wide mt-1">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+        <div className="flex flex-col gap-1.5">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={6}
+            placeholder="Paste your presentation content here…"
+            className="w-full border border-[#E0D9D2] rounded-[12px] px-3 py-2 text-sm text-[#25262B] resize-none focus:outline-none focus:ring-2 focus:ring-[#FFD034] transition"
+          />
+          <p className="text-xs text-[#8B8B8B]">Paste content from Pres Coach or write your own</p>
         </div>
       </div>
 
@@ -377,10 +317,10 @@ export default function SlideMaker() {
           className="self-start h-11 px-6 rounded-[99px] bg-[#FFD034] text-[#25262B] font-semibold text-sm flex items-center gap-2 hover:bg-[#FFD034]/90 transition-colors"
         >
           <Zap size={15} />
-          Generate Now
+          Generate Slides
         </button>
         <p className="text-[#8B8B8B] text-xs">
-          Skips countdown — generates slides immediately from your completed tasks.
+          AI will build your slide deck from the content above.
         </p>
       </div>
     </div>

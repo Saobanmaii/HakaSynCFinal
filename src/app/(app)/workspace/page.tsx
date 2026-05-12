@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Layers, Clock } from "lucide-react";
+import { Zap, Layers, Clock, Mic2 } from "lucide-react";
 import TaskSplitter from "@/components/workspace/TaskSplitter";
 import SlideMaker from "@/components/workspace/SlideMaker";
 import TimeSplitter from "@/components/workspace/TimeSplitter";
+import PresCoach from "@/components/workspace/PresCoach";
 
-type Tab = "tasks" | "slides" | "timeline";
+type Tab = "tasks" | "slides" | "timeline" | "coach";
 
 const TABS: { id: Tab; label: string; icon: typeof Zap }[] = [
-  { id: "tasks", label: "Task Splitter", icon: Zap },
-  { id: "slides", label: "Slide Maker", icon: Layers },
+  { id: "tasks",    label: "Task Splitter", icon: Zap },
+  { id: "slides",   label: "Slide Maker",   icon: Layers },
   { id: "timeline", label: "Time Splitter", icon: Clock },
+  { id: "coach",    label: "Pres Coach",    icon: Mic2 },
 ];
 
 export default function WorkspacePage() {
@@ -43,9 +45,10 @@ export default function WorkspacePage() {
         ))}
       </div>
 
-      {tab === "tasks" && <TaskSplitter />}
-      {tab === "slides" && <SlideMaker />}
+      {tab === "tasks"    && <TaskSplitter />}
+      {tab === "slides"   && <SlideMaker />}
       {tab === "timeline" && <TimeSplitter />}
+      {tab === "coach"    && <PresCoach />}
     </div>
   );
 }
