@@ -456,6 +456,41 @@ export const MOCK_PORTFOLIO: PortfolioEntry = {
   skills: ["React", "Node.js", "TypeScript", "AI Integration", "System Design", "Team Leadership"],
 };
 
+export const MOCK_PROJECTS: PortfolioEntry[] = [
+  {
+    id: "p1",
+    projectTitle: "NeuroStack — AI Study Assistant",
+    role: "Full-stack Developer & Tech Lead",
+    duration: "March 2026 – June 2026",
+    teamSize: 5,
+    description:
+      "Led development of an AI-powered study assistant that personalizes learning paths for university students. Integrated Google Gemini API for real-time content adaptation.",
+    achievements: [
+      "Top 10 finalist at Vietnam AI Challenge 2026",
+      "Reduced study time by 40% in beta testing with 50 users",
+      "Built end-to-end AI pipeline achieving <2s response latency",
+    ],
+    techStack: ["Next.js 14", "TypeScript", "Gemini API", "Tailwind CSS", "Prisma"],
+    skills: ["React", "Node.js", "TypeScript", "AI Integration", "Team Leadership"],
+  },
+  {
+    id: "p2",
+    projectTitle: "GreenBit — Carbon Tracker",
+    role: "Frontend Developer",
+    duration: "January 2026 – March 2026",
+    teamSize: 4,
+    description:
+      "Built a carbon footprint tracking dashboard with blockchain-backed verification. Users log daily activities and see real-time environmental impact visualizations.",
+    achievements: [
+      "2nd place at HCMC Startup Pitch 2025",
+      "500+ beta users in the first month",
+      "Integrated Web3 wallet connection for immutable data logging",
+    ],
+    techStack: ["React", "Web3.js", "Tailwind CSS", "Chart.js"],
+    skills: ["React", "Blockchain", "UI/UX", "Data Visualization"],
+  },
+];
+
 export const MOCK_APPLICATIONS: TeamApplication[] = [
   {
     id: "app1",

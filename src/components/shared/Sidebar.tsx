@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Users, Briefcase, Archive, LogOut } from "lucide-react";
+import { LayoutGrid, Users, Briefcase, Archive, LogOut, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/workspace", icon: Briefcase, label: "Workspace" },
   { href: "/dashboard", icon: LayoutGrid, label: "Dashboard" },
   { href: "/archive", icon: Archive, label: "Archive" },
+  { href: "/profile", icon: UserCircle2, label: "Profile" },
 ];
 
 export function Sidebar() {
@@ -58,11 +59,13 @@ export function Sidebar() {
         <LogOut size={18} strokeWidth={1.8} />
       </button>
 
-      {/* User avatar */}
+      {/* User avatar → profile link */}
       {user && (
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#FFD034]">
-          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-        </div>
+        <Link href="/profile" title="My Profile">
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#FFD034] hover:border-[#FF6B6B] transition-colors">
+            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+          </div>
+        </Link>
       )}
     </aside>
   );
