@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* HakaSynC Design System */
+    --bg: #F4F0EB;
+    --card-light: #FFFFFF;
+    --card-dark: #25262B;
+    --card-muted: #D1C7BD;
+    --primary: #FFD034;
+    --coral: #FF6B6B;
+    --text-primary: #25262B;
+    --text-muted: #8B8B8B;
+    --text-on-dark: #FFFFFF;
+
+    /* shadcn/ui compatibility */
+    --background: 240 10% 97%;
+    --foreground: 222 14% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 14% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 14% 16%;
+    --primary-shadcn: 222 14% 16%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 13% 91%;
+    --secondary-foreground: 222 14% 16%;
+    --muted: 220 13% 91%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 220 13% 91%;
+    --accent-foreground: 222 14% 16%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 222 14% 16%;
+    --radius: 0.625rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-poppins), 'Quicksand', sans-serif;
+  }
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-page-in {
+    animation: page-in 0.22s ease-out both;
+  }
+
+  /* Card variants */
+  .card-light {
+    background-color: var(--card-light);
+    border-radius: 28px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  }
+
+  .card-dark {
+    background-color: var(--card-dark);
+    border-radius: 28px;
+    color: var(--text-on-dark);
+  }
+
+  .card-muted {
+    background-color: var(--card-muted);
+    border-radius: 28px;
+  }
+
+  /* Pill / button radius */
+  .pill {
+    border-radius: 99px;
+  }
+
+  /* Gradient mesh blob */
+  .blob {
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.7;
+    position: absolute;
+    pointer-events: none;
+  }
+}
