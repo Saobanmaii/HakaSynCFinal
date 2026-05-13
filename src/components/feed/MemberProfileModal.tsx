@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { User } from "@/lib/types";
-import { X, MessageCircle, UserPlus, Check, Mail, Code2, ExternalLink, Briefcase, Star } from "lucide-react";
+import { X, MessageCircle, Send, Check, Mail, Code2, ExternalLink, Briefcase, Star } from "lucide-react";
 
 const STATUS_STYLE: Record<User["status"], string> = {
   Looking: "bg-emerald-100 text-emerald-700",
@@ -22,9 +22,9 @@ interface Props {
 }
 
 export default function MemberProfileModal({ user, onClose }: Props) {
-  const [connected, setConnected] = useState(false);
+  const [invited, setInvited] = useState(false);
 
-  useEffect(() => { setConnected(false); }, [user?.id]);
+  useEffect(() => { setInvited(false); }, [user?.id]);
 
   useEffect(() => {
     if (!user) return;
@@ -193,15 +193,15 @@ export default function MemberProfileModal({ user, onClose }: Props) {
           {/* Action buttons */}
           <div className="flex gap-3">
             <button
-              onClick={() => setConnected((v) => !v)}
+              onClick={() => setInvited((v) => !v)}
               className={`flex-1 h-10 rounded-[99px] text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                connected
-                  ? "bg-emerald-100 text-emerald-700"
+                invited
+                  ? "bg-[#FFD034]/20 text-[#b8960a]"
                   : "bg-[#25262B] text-white hover:bg-[#25262B]/90"
               }`}
             >
-              {connected ? <Check size={15} /> : <UserPlus size={15} />}
-              {connected ? "Connected" : "Connect"}
+              {invited ? <Check size={15} /> : <Send size={15} />}
+              {invited ? "Invited" : "Invite"}
             </button>
             <button className="flex-1 h-10 rounded-[99px] border-2 border-[#25262B] text-[#25262B] text-sm font-semibold hover:bg-[#25262B] hover:text-white transition-colors flex items-center justify-center gap-2">
               <MessageCircle size={15} />

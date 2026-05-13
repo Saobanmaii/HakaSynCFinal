@@ -2,7 +2,7 @@
 
 import type { User } from "@/lib/types";
 import { useState } from "react";
-import { UserPlus, Check } from "lucide-react";
+import { Send, Check } from "lucide-react";
 
 const STATUS_STYLE: Record<User["status"], string> = {
   Looking: "bg-emerald-100 text-emerald-700",
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function MemberCard({ user, onOpenProfile }: Props) {
-  const [connected, setConnected] = useState(false);
+  const [invited, setInvited] = useState(false);
 
   return (
     <div
@@ -64,27 +64,27 @@ export default function MemberCard({ user, onOpenProfile }: Props) {
         )}
       </div>
 
-      {/* Connect button */}
+      {/* Invite button */}
       <button
         onClick={(e) => {
           e.stopPropagation();
-          setConnected((v) => !v);
+          setInvited((v) => !v);
         }}
         className={`mt-auto w-full h-9 rounded-[99px] text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 ${
-          connected
-            ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-200"
+          invited
+            ? "bg-[#FFD034]/20 text-[#b8960a] border-2 border-[#FFD034]/40"
             : "border-2 border-[#25262B] text-[#25262B] hover:bg-[#25262B] hover:text-white"
         }`}
       >
-        {connected ? (
+        {invited ? (
           <>
             <Check size={14} />
-            Connected
+            Invited
           </>
         ) : (
           <>
-            <UserPlus size={14} />
-            Connect
+            <Send size={14} />
+            Invite
           </>
         )}
       </button>

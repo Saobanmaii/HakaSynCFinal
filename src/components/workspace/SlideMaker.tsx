@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Zap, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Zap, RotateCcw, Download, Clock } from "lucide-react";
 import { MOCK_SLIDES, CURRENT_USER, MOCK_MEMBERS } from "@/lib/mockData";
 import type { SlideContent } from "@/lib/types";
 import { toast } from "sonner";
@@ -175,6 +175,147 @@ function renderSlide(slide: SlideContent) {
   }
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatCountdown(s: number) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+
+function buildSlidesHTML(slides: SlideContent[]): string {
+  const slideDivs = slides.map((slide, i) => {
+    let bg = "#ffffff";
+    let inner = "";
+
+    switch (slide.type) {
+      case "cover":
+        bg = "#25262B";
+        inner = `
+          <div style="display:flex;flex-direction:column;justify-content:center;flex:1;padding:2rem 2.5rem;">
+            <p style="color:#FFD034;font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1rem;">${slide.bullets[2] ?? ""}</p>
+            <h1 style="color:white;font-size:2.4rem;font-weight:700;line-height:1.2;margin-bottom:.75rem;">${slide.title}</h1>
+            ${slide.subtitle ? `<p style="color:rgba(255,255,255,.5);font-size:1rem;">${slide.subtitle}</p>` : ""}
+          </div>
+          <div style="padding:.75rem 2.5rem;border-top:1px solid rgba(255,255,255,.1);">
+            <span style="color:rgba(255,255,255,.4);font-size:.75rem;">${slide.bullets[0] ?? ""} · ${slide.bullets[1] ?? ""}</span>
+          </div>`;
+        break;
+      case "overview":
+        inner = `
+          <div style="padding:2rem 2.5rem;">
+            <h2 style="color:#25262B;font-size:1.4rem;font-weight:700;border-left:4px solid #FFD034;padding-left:.75rem;margin-bottom:1.5rem;">${slide.title}</h2>
+            ${slide.bullets.map((b, j) => `
+              <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1rem;">
+                <span style="width:1.4rem;height:1.4rem;border-radius:50%;background:#FFD034;color:#7A6000;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${j + 1}</span>
+                <p style="color:#25262B;font-size:.88rem;line-height:1.6;">${b}</p>
+              </div>`).join("")}
+          </div>`;
+        break;
+      case "progress":
+        bg = "#F4F0EB";
+        inner = `
+          <div style="padding:2rem 2.5rem;">
+            <h2 style="color:#25262B;font-size:1.4rem;font-weight:700;border-left:4px solid #22c55e;padding-left:.75rem;margin-bottom:1.5rem;">${slide.title}</h2>
+            ${slide.bullets.map((b) => {
+              const isDone = b.startsWith("✅");
+              const isProg = b.startsWith("🔄");
+              const text = b.replace(/^[✅🔄📋]\s*/, "");
+              const icon = isDone ? "✓" : isProg ? "→" : "·";
+              const bg2 = isDone ? "#dcfce7" : isProg ? "rgba(255,208,52,.3)" : "#fff";
+              const col = isDone ? "#16a34a" : isProg ? "#7A6000" : "#9ca3af";
+              return `
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+                  <span style="width:1.4rem;height:1.4rem;border-radius:50%;background:${bg2};color:${col};font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${icon}</span>
+                  <p style="color:#25262B;font-size:.88rem;">${text}</p>
+                </div>`;
+            }).join("")}
+          </div>`;
+        break;
+      case "team":
+        bg = "#25262B";
+        inner = `
+          <div style="padding:2rem 2.5rem;">
+            <h2 style="color:white;font-size:1.4rem;font-weight:700;border-left:4px solid #FFD034;padding-left:.75rem;margin-bottom:1.5rem;">${slide.title}</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+              ${slide.bullets.map((m) => {
+                const [name, ...rest] = m.split(" — ");
+                return `
+                  <div style="background:rgba(255,255,255,.05);border-radius:1rem;padding:.75rem 1rem;">
+                    <p style="color:white;font-weight:600;font-size:.88rem;">${name}</p>
+                    <p style="color:rgba(255,255,255,.5);font-size:.78rem;">${rest.join(" — ")}</p>
+                  </div>`;
+              }).join("")}
+            </div>
+          </div>`;
+        break;
+      case "conclusion":
+        inner = `
+          <div style="padding:2rem 2.5rem;position:relative;">
+            <div style="position:absolute;top:0;right:0;width:7rem;height:7rem;background:#FFD034;border-radius:0 0 0 2.5rem;"></div>
+            <div style="position:relative;">
+              <h2 style="color:#25262B;font-size:2rem;font-weight:700;margin-bottom:.5rem;">${slide.title}</h2>
+              ${slide.subtitle ? `<p style="color:#8B8B8B;font-size:.88rem;margin-bottom:1.25rem;">${slide.subtitle}</p>` : ""}
+              ${slide.bullets.map((b) => `
+                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                  <div style="width:.4rem;height:.4rem;border-radius:50%;background:#FFD034;flex-shrink:0;"></div>
+                  <p style="color:#25262B;font-size:.88rem;">${b}</p>
+                </div>`).join("")}
+            </div>
+          </div>`;
+        break;
+    }
+
+    return `<div class="slide${i === 0 ? " active" : ""}" style="background:${bg};">${inner}</div>`;
+  }).join("\n");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Presentation Deck</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:1rem;padding:1rem}
+    .deck{width:min(780px,95vw)}
+    .slide{display:none;border-radius:1.5rem;overflow:hidden;aspect-ratio:16/9;flex-direction:column}
+    .slide.active{display:flex}
+    nav{display:flex;align-items:center;gap:.75rem;justify-content:center}
+    nav button{background:rgba(255,255,255,.1);border:none;color:white;width:2.2rem;height:2.2rem;border-radius:50%;cursor:pointer;font-size:.9rem;transition:background .15s}
+    nav button:hover{background:rgba(255,255,255,.2)}
+    nav button:disabled{opacity:.3;cursor:not-allowed}
+    #counter{color:rgba(255,255,255,.5);font-size:.82rem;min-width:3.5rem;text-align:center}
+    .dots{display:flex;gap:.4rem;align-items:center}
+    .dot{width:.5rem;height:.5rem;border-radius:99px;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s;border:none}
+    .dot.active{width:1.4rem;background:#FFD034}
+  </style>
+</head>
+<body>
+  <div class="deck">
+${slideDivs}
+  </div>
+  <nav>
+    <button id="prev" onclick="go(-1)">&#8592;</button>
+    <span id="counter">1 / ${slides.length}</span>
+    <div class="dots">${slides.map((_, i) => `<button class="dot${i === 0 ? " active" : ""}" onclick="goTo(${i})"></button>`).join("")}</div>
+    <button id="next" onclick="go(1)">&#8594;</button>
+  </nav>
+  <script>
+    let cur=0;
+    const slides=document.querySelectorAll('.slide');
+    const dots=document.querySelectorAll('.dot');
+    function show(i){slides[cur].classList.remove('active');dots[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');dots[cur].classList.add('active');document.getElementById('counter').textContent=(cur+1)+' / '+slides.length;document.getElementById('prev').disabled=cur===0;document.getElementById('next').disabled=cur===slides.length-1;}
+    function go(d){if(cur+d>=0&&cur+d<slides.length)show(cur+d);}
+    function goTo(i){show(i);}
+    document.addEventListener('keydown',(e)=>{if(e.key==='ArrowLeft')go(-1);if(e.key==='ArrowRight')go(1);});
+    document.getElementById('prev').disabled=true;
+  </script>
+</body>
+</html>`;
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function SlideMaker() {
@@ -183,11 +324,12 @@ export default function SlideMaker() {
   const [generated, setGenerated] = useState(false);
   const [current, setCurrent] = useState(0);
 
-  async function handleGenerate() {
-    if (!content.trim()) {
-      toast.error("Please paste your presentation content first.");
-      return;
-    }
+  const [triggerEnabled, setTriggerEnabled] = useState(false);
+  const [triggerDate, setTriggerDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [triggerTime, setTriggerTime] = useState("13:00");
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  async function doGenerate() {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
     setGenerated(true);
@@ -198,11 +340,53 @@ export default function SlideMaker() {
     });
   }
 
+  async function handleGenerate() {
+    if (!content.trim()) {
+      toast.error("Please paste your presentation content first.");
+      return;
+    }
+    await doGenerate();
+  }
+
   function handleReset() {
     setGenerated(false);
     setCurrent(0);
+    setTriggerEnabled(false);
+    setCountdown(null);
   }
 
+  function handleDownload() {
+    const html = buildSlidesHTML(MOCK_SLIDES);
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `slides-${Date.now()}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Downloaded!", { description: "Open the .html file to edit and present." });
+  }
+
+  // Countdown timer
+  useEffect(() => {
+    if (!triggerEnabled || !triggerDate || !triggerTime) return;
+    const target = new Date(`${triggerDate}T${triggerTime}:00`).getTime();
+    const interval = setInterval(() => {
+      const diff = Math.floor((target - Date.now()) / 1000);
+      if (diff <= 0) {
+        clearInterval(interval);
+        setTriggerEnabled(false);
+        setCountdown(null);
+        doGenerate();
+      } else {
+        setCountdown(diff);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerEnabled, triggerDate, triggerTime]);
+
+  // Keyboard navigation
   useEffect(() => {
     if (!generated) return;
     const handler = (e: KeyboardEvent) => {
@@ -242,13 +426,22 @@ export default function SlideMaker() {
             <p className="font-bold text-[#25262B]">Presentation Deck</p>
             <p className="text-[#8B8B8B] text-sm">Slide {current + 1} of {MOCK_SLIDES.length}</p>
           </div>
-          <button
-            onClick={handleReset}
-            className="h-9 px-4 rounded-[99px] border border-[#E0D9D2] text-[#8B8B8B] text-sm font-medium flex items-center gap-2 hover:text-[#25262B] hover:border-[#25262B] transition-colors"
-          >
-            <RotateCcw size={14} />
-            Reset
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownload}
+              className="h-9 px-4 rounded-[99px] bg-[#FFD034] text-[#25262B] text-sm font-semibold flex items-center gap-2 hover:bg-[#FFD034]/90 transition-colors"
+            >
+              <Download size={14} />
+              Download
+            </button>
+            <button
+              onClick={handleReset}
+              className="h-9 px-4 rounded-[99px] border border-[#E0D9D2] text-[#8B8B8B] text-sm font-medium flex items-center gap-2 hover:text-[#25262B] hover:border-[#25262B] transition-colors"
+            >
+              <RotateCcw size={14} />
+              Reset
+            </button>
+          </div>
         </div>
 
         {renderSlide(slide)}
@@ -296,9 +489,67 @@ export default function SlideMaker() {
   // Setup
   return (
     <div className="max-w-2xl flex flex-col gap-6">
+      {/* Auto Trigger */}
+      <div className="bg-white rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-[#FFD034]" />
+            <p className="font-semibold text-[#25262B]">Auto-generate Trigger</p>
+          </div>
+          {triggerEnabled && (
+            <button
+              onClick={() => { setTriggerEnabled(false); setCountdown(null); }}
+              className="h-8 px-3 rounded-[99px] bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-100 transition-colors"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+
+        {triggerEnabled && countdown !== null ? (
+          <div className="flex flex-col items-center gap-2 py-3">
+            <p className="text-[#8B8B8B] text-sm">Slides will auto-generate in</p>
+            <p className={`font-mono text-3xl font-bold tracking-widest ${countdown < 600 ? "text-red-400" : "text-[#FFD034]"}`}>
+              {formatCountdown(countdown)}
+            </p>
+            <p className="text-[#8B8B8B] text-xs">
+              Triggered at {triggerTime} on {triggerDate}
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-end gap-3 flex-wrap">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-[#8B8B8B]">Date</label>
+              <input
+                type="date"
+                value={triggerDate}
+                onChange={(e) => setTriggerDate(e.target.value)}
+                className="border border-[#E0D9D2] rounded-[12px] px-3 py-2 text-sm text-[#25262B] focus:outline-none focus:ring-2 focus:ring-[#FFD034] transition"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-[#8B8B8B]">Time</label>
+              <input
+                type="time"
+                value={triggerTime}
+                onChange={(e) => setTriggerTime(e.target.value)}
+                className="border border-[#E0D9D2] rounded-[12px] px-3 py-2 text-sm text-[#25262B] focus:outline-none focus:ring-2 focus:ring-[#FFD034] transition"
+              />
+            </div>
+            <button
+              onClick={() => setTriggerEnabled(true)}
+              className="h-10 px-4 rounded-[99px] bg-[#25262B] text-white text-sm font-semibold flex items-center gap-2 hover:bg-[#25262B]/90 transition-colors"
+            >
+              <Clock size={14} />
+              Enable Trigger
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
       <div className="bg-white rounded-[28px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <p className="font-semibold text-[#25262B] mb-4">Presentation content</p>
-
         <div className="flex flex-col gap-1.5">
           <textarea
             value={content}
