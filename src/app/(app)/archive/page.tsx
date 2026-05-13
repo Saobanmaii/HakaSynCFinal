@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Brain, BarChart2, FileText, Sparkles, Download, Globe, CheckCircle2 } from "lucide-react";
 import { MOCK_PORTFOLIO, MOCK_TASKS, CURRENT_USER } from "@/lib/mockData";
 import { toast } from "sonner";
+import RadarChart from "@/components/archive/RadarChart";
 
 type Tab = "contribution" | "summary" | "portfolio";
 
@@ -11,6 +12,15 @@ const TABS: { id: Tab; label: string; icon: typeof Brain }[] = [
   { id: "contribution", label: "Contribution",     icon: Brain     },
   { id: "summary",      label: "Project Summary",  icon: BarChart2 },
   { id: "portfolio",    label: "Portfolio Preview", icon: FileText  },
+];
+
+const MOCK_RADAR_DATA = [
+  { axis: "Technical",   value: 85 },
+  { axis: "Completion",  value: 78 },
+  { axis: "Teamwork",    value: 70 },
+  { axis: "Comms",       value: 65 },
+  { axis: "Consistency", value: 80 },
+  { axis: "Leadership",  value: 60 },
 ];
 
 const MOCK_CONTRIBUTION = {
@@ -162,6 +172,32 @@ export default function ArchivePage() {
                     {MOCK_CONTRIBUTION.activityCount}
                   </p>
                   <p className="text-xs text-[#8B8B8B] mt-1">Activities Logged</p>
+                </div>
+              </div>
+
+              {/* Skill Radar */}
+              <div className="bg-white rounded-[24px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+                <p className="text-sm font-semibold text-[#25262B] mb-0.5">Skill Radar</p>
+                <p className="text-xs text-[#8B8B8B] mb-4">AI-assessed across 6 competency dimensions</p>
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                  <div className="shrink-0">
+                    <RadarChart data={MOCK_RADAR_DATA} />
+                  </div>
+                  <div className="flex flex-col gap-2.5 w-full">
+                    {MOCK_RADAR_DATA.map(({ axis, value }) => (
+                      <div key={axis} className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#FFD034] shrink-0" />
+                        <span className="text-xs text-[#8B8B8B] w-20 shrink-0">{axis}</span>
+                        <div className="flex-1 h-1.5 bg-[#F4F0EB] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#FFD034] rounded-full"
+                            style={{ width: `${value}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-semibold text-[#25262B] w-8 text-right">{value}%</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
